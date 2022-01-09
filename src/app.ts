@@ -1,7 +1,15 @@
 import express from 'express';
+import bodyParser from 'body-parser'
+
+import skillRouter from "./routes/Skill.router";
 
 const app = express();
 const port = 3000;
+
+
+app.use(bodyParser.urlencoded({extended: false}))
+
+app.use('/skills', skillRouter);
 
 app.get( "/", ( req, res ) => {
     const a = 10;
