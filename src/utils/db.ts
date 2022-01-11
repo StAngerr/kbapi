@@ -1,10 +1,12 @@
 import mysql from 'mysql2';
 
+import dbConfig from "../config/db.config";
+
 const pool = mysql.createPool({
-    host: 'localhost',
-    user: 'root',
-    password: 'admin',
-    database: 'knblock'
+    host: dbConfig.HOST,
+    user: dbConfig.USER,
+    password: dbConfig.PASSWORD,
+    database: dbConfig.DB
 });
 
 export default pool.promise();
