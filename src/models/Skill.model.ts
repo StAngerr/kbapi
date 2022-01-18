@@ -27,7 +27,7 @@ Skill.init({
     sequelize,
     modelName: 'Skill',
     tableName: 'skills'
-}).sync({ alter: true });
+}).sync();
 
 
 Skill.belongsTo(User, {

@@ -28,7 +28,7 @@ User.init({
         type: DataTypes.STRING,
         allowNull: false
     }
-}, {sequelize, modelName: 'User', tableName: 'user'}).sync({alter: true})
+}, {sequelize, modelName: 'User', tableName: 'user'}).sync()
 
 
 export default User;
