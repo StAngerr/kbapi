@@ -27,8 +27,21 @@ User.init({
     email: {
         type: DataTypes.STRING,
         allowNull: false
+    },
+    password: {
+        type: DataTypes.STRING,
+        allowNull: false
     }
-}, {sequelize, modelName: 'User', tableName: 'user'}).sync()
+}, {sequelize, modelName: 'User', tableName: 'users'}).sync(
+    {alter: true}
+)
 
+User.update({
+    password: '123'
+},{
+    where: {
+        password: ''
+    }
+}).then(console.log).catch(console.log)
 
 export default User;
