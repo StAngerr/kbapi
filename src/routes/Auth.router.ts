@@ -3,6 +3,7 @@ import {
   handleLoginRequest,
   handleLogoutRequest,
   handleRegisterRequest,
+  validateSession,
 } from "../controllers/Auth.controller";
 
 const router = Router();
@@ -22,6 +23,10 @@ router.get("/logout", (req: Request, res: Response) => {
 
 router.post("/register", (req: Request, res: Response) => {
   handleRegisterRequest(req, res);
+});
+
+router.get("/status", (req: Request, res: Response) => {
+  validateSession(req, res);
 });
 
 export default router;
