@@ -2,17 +2,16 @@ import { Request, Response } from "express";
 import bcryptjs from "bcryptjs";
 import User from "../models/User.model";
 import UserDTO from "../models/dto/UserDTO";
-import session from "express-session";
 
 const saltRounds = 12;
 
-type ExtendedSession = session.Session & { user: User };
-type RequestExtendedSession = Request & { session: ExtendedSession };
+declare module "express-session" {
+  interface SessionData {
+    user: User;
+  }
+}
 
-export const handleLoginRequest = (
-  req: RequestExtendedSession,
-  res: Response
-) => {
+export const handleLoginRequest = (req: Request, res: Response) => {
   const { email, password } = req.body;
   User.findOne({
     where: {
@@ -51,7 +50,7 @@ export const handleRegisterRequest = (req: Request, res: Response) => {
       email,
       password: hashedPassword,
     }).then((newUser) => {
-      newUser.save().then((user) => res.send(user));
+      newUser.save().then((user) => res.send(new UserDTO(user)));
     });
   });
 };
@@ -62,9 +61,9 @@ export const handleLogoutRequest = (req: Request, res: Response) => {
   });
 };
 
-export const validateSession = (req: RequestExtendedSession, res: Response) => {
+export const validateSession = (req: Request, res: Response) => {
   if (req.session.user) {
-    res.send(req.session.user);
+    res.send(new User(req.session.user));
   } else {
     res.status(401);
     res.send("Unauthorized");

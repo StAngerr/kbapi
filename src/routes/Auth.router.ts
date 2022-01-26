@@ -9,7 +9,7 @@ import {
 const router = Router();
 
 router.use((req: Request, res: Response, next: NextFunction) => {
-  console.log("Auth router");
+  console.log("Auth router", req.session.id);
   next();
 });
 
