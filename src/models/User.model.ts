@@ -28,14 +28,22 @@ User.init(
     email: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true,
+      unique: "email",
     },
     password: {
       type: DataTypes.STRING,
       allowNull: false,
     },
+    confirmedEmail: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: false,
+    },
   },
-  { sequelize, modelName: "User", tableName: "users" }
+  {
+    sequelize,
+    modelName: "User",
+    tableName: "users",
+  }
 ).sync({ alter: true });
 
 User.update(

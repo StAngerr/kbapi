@@ -5,6 +5,7 @@ const router = Router();
 
 router.use((req, res, next) => {
   console.log("Skill router logged");
+  res.cookie("XSRF-TOKEN", req.csrfToken());
   next();
 });
 
@@ -50,5 +51,7 @@ router.put("/:skillId", (req, res) => {
       res.send(`Skill with id ${skillId} not found`);
     });
 });
+
+router.post("/test", (a, v, next) => v.send("ok"));
 
 export default router;
