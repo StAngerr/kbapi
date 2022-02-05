@@ -1,1 +1,1 @@
-export const EMAIL_DOMAIN = "fenomenseed@gmail.com";
+export const EMAIL_DOMAIN = "knowledgeblock.main@gmail.com";

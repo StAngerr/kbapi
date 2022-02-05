@@ -33,6 +33,8 @@ const sessionStore = new MySQLStore({
 // app.use(bodyParser.urlencoded({extended: true}))
 app.use(cookieParser());
 
+console.log(process.env);
+
 app.use(bodyParser.json());
 app.use(
   cors({
