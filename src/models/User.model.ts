@@ -7,6 +7,7 @@ class User extends Model {
   lastName: string;
   email: string;
   password: string;
+  confirmedEmail: boolean;
 }
 
 User.init(

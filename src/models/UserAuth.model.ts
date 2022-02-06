@@ -24,7 +24,7 @@ UserAuthModel.init(
   {
     sequelize,
     modelName: "UserAuth",
-    tableName: "user-auth",
+    tableName: "user_auth",
   }
 ).sync({ alter: true });
 

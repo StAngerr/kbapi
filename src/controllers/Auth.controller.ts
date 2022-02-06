@@ -30,6 +30,12 @@ export const handleLoginRequest = (req: Request, res: Response) => {
         res.send("Wrong creadentials");
         return;
       }
+      //TODO: restore
+      // if (user.confirmedEmail) {
+      //   res.status(403);
+      //   res.send("Email in not confirmed");
+      //   return;
+      // }
       bcryptjs.compare(password, user.password).then((value) => {
         if (!value) {
           res.status(400);
