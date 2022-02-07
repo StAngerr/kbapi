@@ -9,6 +9,7 @@ import {
   sendEmail,
 } from "../services/email.service";
 import UserAuthModel from "../models/UserAuth.model";
+import { UI_APP_LOGIN_PAGE } from "../constants/common";
 const saltRounds = 12;
 
 declare module "express-session" {
@@ -31,11 +32,11 @@ export const handleLoginRequest = (req: Request, res: Response) => {
         return;
       }
       //TODO: restore
-      // if (user.confirmedEmail) {
-      //   res.status(403);
-      //   res.send("Email in not confirmed");
-      //   return;
-      // }
+      if (!user.confirmedEmail) {
+        res.status(403);
+        res.send("Email in not confirmed");
+        return;
+      }
       bcryptjs.compare(password, user.password).then((value) => {
         if (!value) {
           res.status(400);
@@ -67,11 +68,12 @@ export const handleRegisterRequest = (req: Request, res: Response) => {
     }).then((newUser) => {
       newUser
         .save()
-        .then((user) => {
+        .then((user: User) => {
           res.send(new UserDTO(user));
+          return user;
         })
-        .then(() => {
-          sendEmail(email, confirmEmailTmpl(verifyId));
+        .then((user: User) => {
+          sendEmail(email, confirmEmailTmpl(verifyId, user.id.toString()));
         })
         .catch((e) => console.log(e));
       UserAuthModel.create({
@@ -98,15 +100,28 @@ export const validateSession = (req: Request, res: Response) => {
 };
 
 export const confirmEmail = (req: Request, res: Response) => {
-  const { token } = req.query;
+  const { token, userId } = req.query;
   if (token) {
-    User.findOne({
+    UserAuthModel.findOne({
       where: {
-        confirmationToken: token,
+        userId,
+        confirmEmailToken: token,
       },
-    }).then((user: User | null) => {
-      if (user) {
-        res.send("Success");
+    }).then((userAuthData: UserAuthModel | null) => {
+      if (userAuthData) {
+        User.findOne({
+          where: {
+            id: userId,
+          },
+        }).then((user) => {
+          user.update({
+            confirmedEmail: true,
+          });
+        });
+        userAuthData.update({
+          confirmEmailToken: null,
+        });
+        res.redirect(UI_APP_LOGIN_PAGE);
       } else {
         res.status(400);
         res.send("Invalid token");
@@ -133,6 +148,7 @@ export const restorePassword = (req: Request, res: Response) => {
       }).then((userAuth: UserAuthModel) => {
         const verifyId = crypto.randomBytes(10).toString("hex");
         sendEmail(email, restorePasswordTmpl(verifyId, user.id.toString()));
+        // TODO: add expiration date also!
         userAuth.update({
           changePasswordVerifyToken: verifyId,
         });
@@ -165,6 +181,9 @@ export const changePassword = (req: Request, res: Response) => {
                 })
                 .then(() => res.send(true));
             });
+          authModel.update({
+            changePasswordVerifyToken: null,
+          });
         }
       });
     } else {

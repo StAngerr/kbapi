@@ -45,7 +45,7 @@ User.init(
     modelName: "User",
     tableName: "users",
   }
-).sync({ alter: true });
+).sync({ alter: false });
 
 User.update(
   {
