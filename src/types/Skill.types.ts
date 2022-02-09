@@ -6,12 +6,20 @@ export enum SkillCategoriesEnum {
   Other = "other",
 }
 
+export enum SkillCategoriesToColumnNameEnum {
+  ComputerScience = "computer-science",
+  Mathematics = "mathematics",
+  Sport = "sport",
+  Games = "games",
+  Other = "other",
+}
+
 export const skillCategoriesColumns = [
-  "computer-science",
-  "mathematics",
-  "sport",
-  "games",
-  "other",
+  SkillCategoriesToColumnNameEnum.ComputerScience,
+  SkillCategoriesToColumnNameEnum.Mathematics,
+  SkillCategoriesToColumnNameEnum.Sport,
+  SkillCategoriesToColumnNameEnum.Games,
+  SkillCategoriesToColumnNameEnum.Other,
 ];
 
 export enum ContentElementTypeEnum {

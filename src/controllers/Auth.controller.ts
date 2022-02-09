@@ -92,7 +92,7 @@ export const handleLogoutRequest = (req: Request, res: Response) => {
 
 export const validateSession = (req: Request, res: Response) => {
   if (req.session.user) {
-    res.send(new User(req.session.user));
+    res.send(new UserDTO(req.session.user));
   } else {
     res.status(401);
     res.send("Unauthorized");

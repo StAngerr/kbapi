@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import Skill from "../models/Skill.model";
 import SkillCategoryModel from "../models/SkillCategory.model";
 import CategoryModel from "../models/Category.model";
+import { SkillCategoriesToColumnNameEnum } from "../types/Skill.types";
 
 export const getAllSKills = (req: Request, res: Response) => {
   Skill.findAll().then((data) => {
@@ -20,19 +21,26 @@ export const getSkillById = (req: Request, res: Response) => {
 };
 
 export const createNewSkill = (req: Request, res: Response) => {
-  const { title, description, author, category } = req.body;
-  Skill.create({ title, description, author: 1 })
+  const { title, description, shortDescription, category: ctKey } = req.body;
+  const userId = req.session.user.id;
+  Skill.create({
+    title,
+    description,
+    shortDescription,
+    author: userId,
+  })
     .then((newSkill) => {
-      if (category) {
+      const nn = (<any>SkillCategoriesToColumnNameEnum)[ctKey];
+      if (ctKey) {
         CategoryModel.findOne({
           where: {
-            name: category,
+            name: (<any>SkillCategoriesToColumnNameEnum)[ctKey],
           },
-        }).then((category: CategoryModel) => {
-          if (category) {
+        }).then((categoryObj: CategoryModel) => {
+          if (categoryObj) {
             SkillCategoryModel.create({
               skillId: newSkill.id,
-              category: category.id,
+              categoryId: categoryObj.id,
             }).then((newCategoryMapping) => newCategoryMapping.save());
           }
         });

@@ -68,9 +68,10 @@ app.get("/hello-world", (req, res) => {
 
 app.use("/auth", authRouter);
 
+app.use("/skills", csrfProtection, skillRouter);
+
 app.use(isResourceAllowed);
 
-app.use("/skills", csrfProtection, skillRouter);
 app.use("/users", csrfProtection, userRouter);
 
 sequelize.authenticate().then(() => {
