@@ -2,6 +2,7 @@ import { Request, Response, Router } from "express";
 import Skill from "../models/Skill.model";
 import {
   createNewSkill,
+  deleteSkill,
   getAllSKills,
   getSkillById,
   updateSkill,
@@ -34,6 +35,10 @@ router.get("/categories", (req: Request, res: Response) => {
 
 router.post("/", (req: Request, res: Response) => {
   createNewSkill(req, res);
+});
+
+router.delete("/:id", (req: Request, res: Response) => {
+  deleteSkill(req, res);
 });
 
 router.get("/:skillId", (req: Request, res: Response) => {

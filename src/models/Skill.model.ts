@@ -1,6 +1,7 @@
 import sequelize from "../utils/sequelize";
 import { DataTypes, Model } from "sequelize";
 import User from "./User.model";
+import CategoryModel from "./Category.model";
 
 class Skill extends Model {
   id: number;
@@ -8,7 +9,7 @@ class Skill extends Model {
   description: string;
   shortDescription: string;
   author: number;
-  categories: string[];
+  categories: CategoryModel[];
 }
 
 Skill.init(

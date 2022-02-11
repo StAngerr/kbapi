@@ -2,6 +2,7 @@ import async from "async";
 import { DataTypes, Model } from "sequelize";
 import { skillCategoriesColumns } from "../types/Skill.types";
 import sequelize from "../utils/sequelize";
+import Skill from "./Skill.model";
 
 class CategoryModel extends Model {
   id: number;
@@ -24,7 +25,7 @@ CategoryModel.init(
   },
   {
     sequelize,
-    modelName: "categories",
+    modelName: "CategoryModel",
     tableName: "categories",
   }
 )

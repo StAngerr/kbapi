@@ -27,12 +27,14 @@ SkillCategoryModel.init(
   }
 ).sync({ alter: true });
 
-SkillCategoryModel.belongsToMany(Skill, {
-  through: "skillId",
+Skill.belongsToMany(CategoryModel, {
+  through: SkillCategoryModel,
+  foreignKey: "skillId",
+  as: "categories",
 });
 
-SkillCategoryModel.belongsToMany(CategoryModel, {
-  through: "skillId",
+CategoryModel.belongsToMany(Skill, {
+  through: SkillCategoryModel,
+  foreignKey: "categoryId",
 });
-
 export default SkillCategoryModel;

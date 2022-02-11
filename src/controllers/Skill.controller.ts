@@ -3,10 +3,26 @@ import Skill from "../models/Skill.model";
 import SkillCategoryModel from "../models/SkillCategory.model";
 import CategoryModel from "../models/Category.model";
 import { SkillCategoriesToColumnNameEnum } from "../types/Skill.types";
+import { FindOptions, Op } from "sequelize";
+import { SkillDTO } from "../models/dto/SkillDTO";
+import categoryModel from "../models/Category.model";
 
 export const getAllSKills = (req: Request, res: Response) => {
-  Skill.findAll().then((data) => {
-    res.send(data);
+  const { currentUserOnly } = req.query;
+  const queryOptions: FindOptions = {
+    include: {
+      model: CategoryModel,
+      as: "categories",
+    },
+  };
+  if (currentUserOnly && req.session.user) {
+    queryOptions.where = {
+      author: req.session.user.id,
+    };
+  }
+
+  Skill.findAll(queryOptions).then((data: Skill[]) => {
+    res.send(data.map((item: Skill) => new SkillDTO(item)));
   });
 };
 
@@ -30,7 +46,6 @@ export const createNewSkill = (req: Request, res: Response) => {
     author: userId,
   })
     .then((newSkill) => {
-      const nn = (<any>SkillCategoriesToColumnNameEnum)[ctKey];
       if (ctKey) {
         CategoryModel.findOne({
           where: {
@@ -55,15 +70,72 @@ export const createNewSkill = (req: Request, res: Response) => {
 
 export const updateSkill = (req: Request, res: Response) => {
   const { skillId } = req.params;
-  Skill.findOne({ where: { id: skillId } })
-    .then((skill) => {
-      const toUpdate = { ...skill, ...req.body };
-      Skill.update(toUpdate, { where: { id: skillId } }).then((updatedSkill) =>
-        res.send(updatedSkill)
+  const { title, shortDescription, description, category } =
+    req.body as Skill & { category: string };
+  Skill.findOne({
+    where: { id: skillId },
+    include: {
+      model: CategoryModel,
+      as: "categories",
+    },
+  }).then((skill) => {
+    if (skill) {
+      Skill.update(
+        { title, shortDescription, description },
+        { where: { id: skill.id } }
+      ).then(() =>
+        Skill.findOne({
+          where: { id: skillId },
+        }).then((updatedSkill) => res.send(updatedSkill))
       );
-    })
-    .catch(() => {
+      if (
+        category &&
+        skill.categories.length &&
+        skill.categories[0].name !== category
+      ) {
+        updateCategory(skill.id, category);
+      }
+    } else {
       res.status(404);
       res.send(`Skill with id ${skillId} not found`);
-    });
+    }
+  });
+};
+
+const updateCategory = (skillId: number, categoryName: string) => {
+  CategoryModel.findOne({
+    where: {
+      name: (<any>SkillCategoriesToColumnNameEnum)[categoryName],
+    },
+  }).then((category: categoryModel) => {
+    if (category) {
+      SkillCategoryModel.update(
+        {
+          categoryId: category.id,
+        },
+        {
+          where: {
+            skillId,
+          },
+        }
+      );
+    }
+  });
+};
+
+export const deleteSkill = (req: Request, res: Response) => {
+  const { id } = req.params;
+  Skill.findOne({
+    where: {
+      id,
+    },
+  }).then((skill) => {
+    if (skill) {
+      skill.destroy();
+      res.send(true);
+      return;
+    }
+    res.status(404);
+    res.send(`Skill with id ${id} not found`);
+  });
 };
