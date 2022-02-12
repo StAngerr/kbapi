@@ -8,7 +8,7 @@ import { SkillDTO } from "../models/dto/SkillDTO";
 import categoryModel from "../models/Category.model";
 
 export const getAllSKills = (req: Request, res: Response) => {
-  const { currentUserOnly } = req.query;
+  const { currentUserOnly, searchQuery } = req.query;
   const queryOptions: FindOptions = {
     include: {
       model: CategoryModel,
@@ -21,6 +21,20 @@ export const getAllSKills = (req: Request, res: Response) => {
     };
   }
 
+  if (searchQuery) {
+    if (queryOptions.where) {
+      // @ts-ignore
+      queryOptions.where.title = {
+        [Op.like]: "%" + searchQuery + "%",
+      };
+    } else {
+      queryOptions.where = {
+        title: {
+          [Op.like]: "%" + searchQuery + "%",
+        },
+      };
+    }
+  }
   Skill.findAll(queryOptions).then((data: Skill[]) => {
     res.send(data.map((item: Skill) => new SkillDTO(item)));
   });
