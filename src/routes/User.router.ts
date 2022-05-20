@@ -61,8 +61,11 @@ router.put("/:userId", (req: Request, res: Response) => {
           firstName = uFirstName,
         } = req.body;
         User.update({ email, lastName, firstName }, { where: { id: userId } })
-          .then((updatedUser) => {
-            res.send(updatedUser);
+          .then(() => {
+            User.findOne({ where: { id: userId } }).then((user) => {
+              req.session.user = user;
+              req.session.save(() => res.send(user));
+            });
           })
           .catch((err) => {
             res.status(400);

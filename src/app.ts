@@ -15,6 +15,7 @@ import dbConfig from "./config/db.config";
 import csurf from "csurf";
 
 import { isResourceAllowed } from "./middlewares/is-auth";
+import { UI_APP_BASE_URL } from "./constants/common";
 
 const app = express();
 const port = 3000;
@@ -37,7 +38,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 app.use(
   cors({
-    origin: "http://localhost:4200",
+    origin: UI_APP_BASE_URL,
     credentials: true,
   })
 );

@@ -65,22 +65,26 @@ export const handleRegisterRequest = (req: Request, res: Response) => {
       email,
       password: hashedPassword,
       confirmationToken: verifyId,
-    }).then((newUser) => {
-      newUser
-        .save()
-        .then((user: User) => {
-          res.send(new UserDTO(user));
-          return user;
-        })
-        .then((user: User) => {
-          sendEmail(email, confirmEmailTmpl(verifyId, user.id.toString()));
-        })
-        .catch((e) => console.log(e));
-      UserAuthModel.create({
-        userId: newUser.id,
-        confirmEmailToken: verifyId,
-      }).then((authData: UserAuthModel) => authData.save());
-    });
+    })
+      .then((newUser) => {
+        newUser
+          .save()
+          .then((user: User) => {
+            res.send(new UserDTO(user));
+            return user;
+          })
+          .then((user: User) => {
+            sendEmail(email, confirmEmailTmpl(verifyId, user.id.toString()));
+          })
+          .catch((e) => {
+            console.log(e);
+          });
+        UserAuthModel.create({
+          userId: newUser.id,
+          confirmEmailToken: verifyId,
+        }).then((authData: UserAuthModel) => authData.save());
+      })
+      .catch((e) => res.send(e));
   });
 };
 
@@ -92,7 +96,9 @@ export const handleLogoutRequest = (req: Request, res: Response) => {
 
 export const validateSession = (req: Request, res: Response) => {
   if (req.session.user) {
-    res.send(new UserDTO(req.session.user));
+    User.findOne({ where: { id: req.session.user.id } }).then((user) =>
+      res.send(new UserDTO(user))
+    );
   } else {
     res.status(401);
     res.send("Unauthorized");
